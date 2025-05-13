@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 
 import de.mhus.lib.core.MLog;
@@ -106,8 +107,11 @@ public class TrustFromConfiguration extends MLog implements TrustApi {
     @Override
     public AuthenticationToken createToken(String ticket) {
         String[] parts = ticket.split(":", 3);
-        validatePassword(parts[0], parts[2]);
-        return new TrustedToken(parts[1]);
+        boolean valid = validatePassword(parts[0], parts[2]);
+        if(valid)
+            return new TrustedToken(parts[1]);
+        else
+            throw new AuthorizationException("invalid credentials");
     }
 
     public boolean validatePassword(String name, String password) {
