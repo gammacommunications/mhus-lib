@@ -107,11 +107,19 @@ public class TrustFromConfiguration extends MLog implements TrustApi {
     @Override
     public AuthenticationToken createToken(String ticket) {
         String[] parts = ticket.split(":", 3);
-        boolean valid = validatePassword(parts[0], parts[2]);
-        if(valid)
-            return new TrustedToken(parts[1]);
-        else
+
+        String trustName = parts[0];
+        String trustUserId = parts[1];
+        String trustPassword = parts[2];
+
+        boolean valid = validatePassword(trustName, trustPassword);
+
+        if(valid) {
+            return new TrustedToken(trustUserId);
+        }
+        else {
             throw new AuthorizationException("invalid credentials");
+        }
     }
 
     public boolean validatePassword(String name, String password) {
