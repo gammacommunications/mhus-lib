@@ -37,6 +37,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.mhus.lib.core.cast.Caster;
 import de.mhus.lib.core.cast.DoubleToString;
 import de.mhus.lib.core.cast.FloatToString;
@@ -808,6 +811,7 @@ public final class MCast {
 
             if (type == Map.class) return toMap(in, def);
             if (type == List.class) return toList(in, def);
+            if (type == JsonNode.class) return toJsonNode (in, def);
             // if not found find a default caster (from = Object)
 
             caster = casters.get(Object.class, type);
@@ -843,6 +847,17 @@ public final class MCast {
             if (pos >= 0) out.put(item.substring(0, pos), item.substring(pos + 1));
         }
         return out;
+    }
+
+    private static Object toJsonNode(Object in, Object def) {
+        if (in == null) return def;
+        String s = String.valueOf(in);
+        if (!s.startsWith("{") || !s.endsWith("}")) return def;
+        try {
+            return new ObjectMapper().readTree(s);
+        } catch (JsonProcessingException e) {
+            return def;
+        }
     }
 
     /**
