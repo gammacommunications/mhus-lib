@@ -94,7 +94,7 @@ public class SoftTimeoutMap<K, V> implements Map<K, V> {
         SoftTimeoutMap<K, V>.Container<V> ret = map.get(key);
         if (ret == null) return null;
         if (ret.isTimeout()) {
-            remove(ret);
+            remove(key);
             return null;
         }
         return ret.getValue();
